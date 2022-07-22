@@ -1,0 +1,15 @@
+syntax = "proto3";
+package tbc.tbc;
+
+option go_package = "tbc/x/tbc/types";
+
+message CreatorCoin {
+  string index = 1; 
+  string creator = 2; 
+  string maxSupply = 3; 
+  string initialSupply = 4; 
+  string presalePrice = 5; 
+  string maxPrice = 6; 
+  
+}
+
