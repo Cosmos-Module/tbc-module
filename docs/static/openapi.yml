@@ -29801,6 +29801,58 @@ paths:
           format: uint64
       tags:
         - Query
+  '/tbc/tbc/coin_batch/{queryList}':
+    get:
+      summary: Queries a list of CoinBatch items.
+      operationId: TbcTbcCoinBatch
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              creatorCoin:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    index:
+                      type: string
+                    creator:
+                      type: string
+                    maxSupply:
+                      type: string
+                    initialSupply:
+                      type: string
+                    presalePrice:
+                      type: string
+                    maxPrice:
+                      type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: queryList
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
   /tbc/tbc/coin_list:
     get:
       summary: Queries a list of CoinList items.
@@ -51933,6 +51985,26 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
+  tbc.tbc.QueryCoinBatchResponse:
+    type: object
+    properties:
+      creatorCoin:
+        type: array
+        items:
+          type: object
+          properties:
+            index:
+              type: string
+            creator:
+              type: string
+            maxSupply:
+              type: string
+            initialSupply:
+              type: string
+            presalePrice:
+              type: string
+            maxPrice:
+              type: string
   tbc.tbc.QueryCoinListResponse:
     type: object
     properties:

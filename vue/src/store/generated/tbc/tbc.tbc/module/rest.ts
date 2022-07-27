@@ -58,6 +58,10 @@ export interface TbcQueryAllCreatorCoinResponse {
   pagination?: V1Beta1PageResponse;
 }
 
+export interface TbcQueryCoinBatchResponse {
+  creatorCoin?: TbcCreatorCoin[];
+}
+
 export interface TbcQueryCoinListResponse {
   coinAll?: TbcCoinAll[];
 }
@@ -338,6 +342,22 @@ export class HttpClient<SecurityDataType = unknown> {
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryCoinBatch
+   * @summary Queries a list of CoinBatch items.
+   * @request GET:/tbc/tbc/coin_batch/{queryList}
+   */
+  queryCoinBatch = (queryList: string, params: RequestParams = {}) =>
+    this.request<TbcQueryCoinBatchResponse, RpcStatus>({
+      path: `/tbc/tbc/coin_batch/${queryList}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
   /**
    * No description
    *

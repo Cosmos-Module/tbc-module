@@ -29,6 +29,5 @@ func (k Keeper) Price(goCtx context.Context, req *types.QueryPriceRequest) (*typ
 
 	price := creatorCoin.CalculatePriceWithGivenSupply(currentSupply)
 
-
 	return &types.QueryPriceResponse{Price: price.Uint64()}, nil
 }
