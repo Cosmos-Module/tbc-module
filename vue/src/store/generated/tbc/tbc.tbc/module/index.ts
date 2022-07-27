@@ -4,13 +4,13 @@ import { StdFee } from "@cosmjs/launchpad";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { Registry, OfflineSigner, EncodeObject, DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Api } from "./rest";
-import { MsgInitSale } from "./types/tbc/tx";
 import { MsgBuyCoin } from "./types/tbc/tx";
+import { MsgInitSale } from "./types/tbc/tx";
 
 
 const types = [
-  ["/tbc.tbc.MsgInitSale", MsgInitSale],
   ["/tbc.tbc.MsgBuyCoin", MsgBuyCoin],
+  ["/tbc.tbc.MsgInitSale", MsgInitSale],
   
 ];
 export const MissingWalletError = new Error("wallet is required");
@@ -43,8 +43,8 @@ const txClient = async (wallet: OfflineSigner, { addr: addr }: TxClientOptions =
 
   return {
     signAndBroadcast: (msgs: EncodeObject[], { fee, memo }: SignAndBroadcastOptions = {fee: defaultFee, memo: ""}) => client.signAndBroadcast(address, msgs, fee,memo),
-    msgInitSale: (data: MsgInitSale): EncodeObject => ({ typeUrl: "/tbc.tbc.MsgInitSale", value: MsgInitSale.fromPartial( data ) }),
     msgBuyCoin: (data: MsgBuyCoin): EncodeObject => ({ typeUrl: "/tbc.tbc.MsgBuyCoin", value: MsgBuyCoin.fromPartial( data ) }),
+    msgInitSale: (data: MsgInitSale): EncodeObject => ({ typeUrl: "/tbc.tbc.MsgInitSale", value: MsgInitSale.fromPartial( data ) }),
     
   };
 };

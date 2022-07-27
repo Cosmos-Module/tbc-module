@@ -42,6 +42,11 @@ service Query {
 		option (google.api.http).get = "/tbc/tbc/coin_batch/{queryList}";
 	}
 
+// Queries a list of PricePay items.
+	rpc PricePay(QueryPricePayRequest) returns (QueryPricePayResponse) {
+		option (google.api.http).get = "/tbc/tbc/price_pay/{coin}";
+	}
+
 // this line is used by starport scaffolding # 2
 }
 
@@ -94,6 +99,14 @@ message QueryCoinBatchRequest {
 
 message QueryCoinBatchResponse {
 	repeated CreatorCoin creatorCoin = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryPricePayRequest {
+  string coin = 1;
+}
+
+message QueryPricePayResponse {
+  uint64 price = 1;
 }
 
 // this line is used by starport scaffolding # 3

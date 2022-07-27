@@ -19,9 +19,9 @@ func (k Keeper) CoinBatch(goCtx context.Context, req *types.QueryCoinBatchReques
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	parse := strings.Fields(req.QueryList)
-	var coinList[] types.CreatorCoin
+	var coinList []types.CreatorCoin
 	len := len(parse)
-	for i:=0; i<len; i++ {	
+	for i := 0; i < len; i++ {
 		val, found := k.GetCreatorCoin(
 			ctx,
 			parse[i],
@@ -29,8 +29,6 @@ func (k Keeper) CoinBatch(goCtx context.Context, req *types.QueryCoinBatchReques
 		if !found {
 			return nil, status.Error(codes.NotFound, "not found")
 		}
-
-		
 
 		coinList = append(coinList, val)
 	}

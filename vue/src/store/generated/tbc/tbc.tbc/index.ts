@@ -49,6 +49,7 @@ const getDefaultState = () => {
 				CoinList: {},
 				Price: {},
 				CoinBatch: {},
+				PricePay: {},
 				
 				_Structure: {
 						CoinAll: getStructure(CoinAll.fromPartial({})),
@@ -117,6 +118,12 @@ export default {
 						(<any> params).query=null
 					}
 			return state.CoinBatch[JSON.stringify(params)] ?? {}
+		},
+				getPricePay: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.PricePay[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -292,21 +299,28 @@ export default {
 		},
 		
 		
-		async sendMsgInitSale({ rootGetters }, { value, fee = [], memo = '' }) {
+		
+		
+		 		
+		
+		
+		async QueryPricePay({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgInitSale(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryPricePay( key.coin)).data
+				
+					
+				commit('QUERY', { query: 'PricePay', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryPricePay', payload: { options: { all }, params: {...key},query }})
+				return getters['getPricePay']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgInitSale:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgInitSale:Send Could not broadcast Tx: '+ e.message)
-				}
+				throw new Error('QueryClient:QueryPricePay API Node Unavailable. Could not perform query: ' + e.message)
+				
 			}
 		},
+		
+		
 		async sendMsgBuyCoin({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -322,20 +336,22 @@ export default {
 				}
 			}
 		},
-		
-		async MsgInitSale({ rootGetters }, { value }) {
+		async sendMsgInitSale({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
 				const msg = await txClient.msgInitSale(value)
-				return msg
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
 					throw new Error('TxClient:MsgInitSale:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgInitSale:Create Could not create message: ' + e.message)
+				}else{
+					throw new Error('TxClient:MsgInitSale:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
+		
 		async MsgBuyCoin({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -346,6 +362,19 @@ export default {
 					throw new Error('TxClient:MsgBuyCoin:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgBuyCoin:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgInitSale({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgInitSale(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgInitSale:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgInitSale:Create Could not create message: ' + e.message)
 				}
 			}
 		},

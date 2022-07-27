@@ -78,6 +78,11 @@ export interface TbcQueryParamsResponse {
   params?: TbcParams;
 }
 
+export interface TbcQueryPricePayResponse {
+  /** @format uint64 */
+  price?: string;
+}
+
 export interface TbcQueryPriceResponse {
   /** @format uint64 */
   price?: string;
@@ -453,6 +458,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
   queryPrice = (symbol: string, params: RequestParams = {}) =>
     this.request<TbcQueryPriceResponse, RpcStatus>({
       path: `/tbc/tbc/price/${symbol}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryPricePay
+   * @summary Queries a list of PricePay items.
+   * @request GET:/tbc/tbc/price_pay/{coin}
+   */
+  queryPricePay = (coin: string, params: RequestParams = {}) =>
+    this.request<TbcQueryPricePayResponse, RpcStatus>({
+      path: `/tbc/tbc/price_pay/${coin}`,
       method: "GET",
       format: "json",
       ...params,
