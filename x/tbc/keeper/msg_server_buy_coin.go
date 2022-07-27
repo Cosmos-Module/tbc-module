@@ -29,10 +29,15 @@ func (k msgServer) BuyCoin(goCtx context.Context, msg *types.MsgBuyCoin) (*types
 
 	currentSupply := k.bankKeeper.GetSupply(ctx, creatorCoin.Index)
 
-	amountToPay, err := creatorCoin.CalculateAmountToPay(currentSupply, coinToBuy)
-	parsedAmountToPay := sdk.NewCoins(amountToPay)
+	amountToPay, _ := creatorCoin.CalculateAmountToPay(currentSupply, coinToBuy)
 
-	k.bankKeeper.SendCoins(ctx, buyer, creator, parsedAmountToPay)
+	buyerBalance := sdk.Coins{k.bankKeeper.GetBalance(ctx, buyer, "token")}
+	if buyerBalance[0].Amount.Uint64() < amountToPay.Amount.Uint64() {
+		return nil, sdkerrors.Wrap(types.ErrInsufficientAmount, "account balance")
+	}
+	//코인 가격 지불  
+	buyerBalance[0].Amount = sdk.NewIntFromUint64(amountToPay.Amount.Uint64())
+	k.bankKeeper.SendCoins(ctx, buyer, creator, buyerBalance)
 
 	// Mint creator coin and send to buyer
 	parsedCoinToBuy := sdk.NewCoins(coinToBuy)

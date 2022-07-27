@@ -78,6 +78,10 @@ export interface TbcQueryParamsResponse {
   params?: TbcParams;
 }
 
+export interface TbcQueryPriceBatchResponse {
+  price?: string[];
+}
+
 export interface TbcQueryPricePayResponse {
   /** @format uint64 */
   price?: string;
@@ -458,6 +462,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
   queryPrice = (symbol: string, params: RequestParams = {}) =>
     this.request<TbcQueryPriceResponse, RpcStatus>({
       path: `/tbc/tbc/price/${symbol}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryPriceBatch
+   * @summary Queries a list of PriceBatch items.
+   * @request GET:/tbc/tbc/price_batch/{queryList}
+   */
+  queryPriceBatch = (queryList: string, params: RequestParams = {}) =>
+    this.request<TbcQueryPriceBatchResponse, RpcStatus>({
+      path: `/tbc/tbc/price_batch/${queryList}`,
       method: "GET",
       format: "json",
       ...params,

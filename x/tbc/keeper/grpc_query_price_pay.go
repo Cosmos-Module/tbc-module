@@ -30,8 +30,7 @@ func (k Keeper) PricePay(goCtx context.Context, req *types.QueryPricePayRequest)
 
 	currentSupply := k.bankKeeper.GetSupply(ctx, creatorCoin.Index)
 
-	amountToPay, err := creatorCoin.CalculateAmountToPay(currentSupply, coinToBuy)
-	
+	amountToPay, _ := creatorCoin.CalculateAmountToPay(currentSupply, coinToBuy)
 
 	return &types.QueryPricePayResponse{Price: amountToPay.Amount.Uint64()}, nil
 }

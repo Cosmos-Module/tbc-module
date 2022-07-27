@@ -47,6 +47,11 @@ service Query {
 		option (google.api.http).get = "/tbc/tbc/price_pay/{coin}";
 	}
 
+// Queries a list of PriceBatch items.
+	rpc PriceBatch(QueryPriceBatchRequest) returns (QueryPriceBatchResponse) {
+		option (google.api.http).get = "/tbc/tbc/price_batch/{queryList}";
+	}
+
 // this line is used by starport scaffolding # 2
 }
 
@@ -107,6 +112,14 @@ message QueryPricePayRequest {
 
 message QueryPricePayResponse {
   uint64 price = 1;
+}
+
+message QueryPriceBatchRequest {
+  string queryList = 1;
+}
+
+message QueryPriceBatchResponse {
+	repeated uint64 price = 1;
 }
 
 // this line is used by starport scaffolding # 3

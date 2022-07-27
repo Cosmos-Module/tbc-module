@@ -69,6 +69,14 @@ export interface QueryPricePayResponse {
   price: number;
 }
 
+export interface QueryPriceBatchRequest {
+  queryList: string;
+}
+
+export interface QueryPriceBatchResponse {
+  price: number[];
+}
+
 const baseQueryParamsRequest: object = {};
 
 export const QueryParamsRequest = {
@@ -973,6 +981,148 @@ export const QueryPricePayResponse = {
   },
 };
 
+const baseQueryPriceBatchRequest: object = { queryList: "" };
+
+export const QueryPriceBatchRequest = {
+  encode(
+    message: QueryPriceBatchRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.queryList !== "") {
+      writer.uint32(10).string(message.queryList);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryPriceBatchRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryPriceBatchRequest } as QueryPriceBatchRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.queryList = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryPriceBatchRequest {
+    const message = { ...baseQueryPriceBatchRequest } as QueryPriceBatchRequest;
+    if (object.queryList !== undefined && object.queryList !== null) {
+      message.queryList = String(object.queryList);
+    } else {
+      message.queryList = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryPriceBatchRequest): unknown {
+    const obj: any = {};
+    message.queryList !== undefined && (obj.queryList = message.queryList);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryPriceBatchRequest>
+  ): QueryPriceBatchRequest {
+    const message = { ...baseQueryPriceBatchRequest } as QueryPriceBatchRequest;
+    if (object.queryList !== undefined && object.queryList !== null) {
+      message.queryList = object.queryList;
+    } else {
+      message.queryList = "";
+    }
+    return message;
+  },
+};
+
+const baseQueryPriceBatchResponse: object = { price: 0 };
+
+export const QueryPriceBatchResponse = {
+  encode(
+    message: QueryPriceBatchResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    writer.uint32(10).fork();
+    for (const v of message.price) {
+      writer.uint64(v);
+    }
+    writer.ldelim();
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryPriceBatchResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryPriceBatchResponse,
+    } as QueryPriceBatchResponse;
+    message.price = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.price.push(longToNumber(reader.uint64() as Long));
+            }
+          } else {
+            message.price.push(longToNumber(reader.uint64() as Long));
+          }
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryPriceBatchResponse {
+    const message = {
+      ...baseQueryPriceBatchResponse,
+    } as QueryPriceBatchResponse;
+    message.price = [];
+    if (object.price !== undefined && object.price !== null) {
+      for (const e of object.price) {
+        message.price.push(Number(e));
+      }
+    }
+    return message;
+  },
+
+  toJSON(message: QueryPriceBatchResponse): unknown {
+    const obj: any = {};
+    if (message.price) {
+      obj.price = message.price.map((e) => e);
+    } else {
+      obj.price = [];
+    }
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryPriceBatchResponse>
+  ): QueryPriceBatchResponse {
+    const message = {
+      ...baseQueryPriceBatchResponse,
+    } as QueryPriceBatchResponse;
+    message.price = [];
+    if (object.price !== undefined && object.price !== null) {
+      for (const e of object.price) {
+        message.price.push(e);
+      }
+    }
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -993,6 +1143,8 @@ export interface Query {
   CoinBatch(request: QueryCoinBatchRequest): Promise<QueryCoinBatchResponse>;
   /** Queries a list of PricePay items. */
   PricePay(request: QueryPricePayRequest): Promise<QueryPricePayResponse>;
+  /** Queries a list of PriceBatch items. */
+  PriceBatch(request: QueryPriceBatchRequest): Promise<QueryPriceBatchResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -1053,6 +1205,16 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("tbc.tbc.Query", "PricePay", data);
     return promise.then((data) =>
       QueryPricePayResponse.decode(new Reader(data))
+    );
+  }
+
+  PriceBatch(
+    request: QueryPriceBatchRequest
+  ): Promise<QueryPriceBatchResponse> {
+    const data = QueryPriceBatchRequest.encode(request).finish();
+    const promise = this.rpc.request("tbc.tbc.Query", "PriceBatch", data);
+    return promise.then((data) =>
+      QueryPriceBatchResponse.decode(new Reader(data))
     );
   }
 }
