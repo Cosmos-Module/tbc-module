@@ -6,6 +6,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "tbc/params.proto";
 import "tbc/creator_coin.proto";
+import "tbc/coin_all.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "tbc/x/tbc/types";
@@ -24,6 +25,16 @@ service Query {
 	// Queries a list of CreatorCoin items.
 	rpc CreatorCoinAll(QueryAllCreatorCoinRequest) returns (QueryAllCreatorCoinResponse) {
 		option (google.api.http).get = "/tbc/tbc/creator_coin";
+	}
+
+// Queries a list of CoinList items.
+	rpc CoinList(QueryCoinListRequest) returns (QueryCoinListResponse) {
+		option (google.api.http).get = "/tbc/tbc/coin_list";
+	}
+
+// Queries a list of Price items.
+	rpc Price(QueryPriceRequest) returns (QueryPriceResponse) {
+		option (google.api.http).get = "/tbc/tbc/price/{symbol}";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -54,6 +65,22 @@ message QueryAllCreatorCoinRequest {
 message QueryAllCreatorCoinResponse {
 	repeated CreatorCoin creatorCoin = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryCoinListRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryCoinListResponse {
+	repeated CoinAll coinAll = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryPriceRequest {
+  string symbol = 1;
+}
+
+message QueryPriceResponse {
+  uint64 price = 1;
 }
 
 // this line is used by starport scaffolding # 3

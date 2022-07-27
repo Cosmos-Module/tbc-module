@@ -1,11 +1,13 @@
 /* eslint-disable */
-import { Reader, Writer } from "protobufjs/minimal";
+import { Reader, util, configure, Writer } from "protobufjs/minimal";
+import * as Long from "long";
 import { Params } from "../tbc/params";
 import { CreatorCoin } from "../tbc/creator_coin";
 import {
   PageRequest,
   PageResponse,
 } from "../cosmos/base/query/v1beta1/pagination";
+import { CoinAll } from "../tbc/coin_all";
 
 export const protobufPackage = "tbc.tbc";
 
@@ -33,6 +35,22 @@ export interface QueryAllCreatorCoinRequest {
 export interface QueryAllCreatorCoinResponse {
   creatorCoin: CreatorCoin[];
   pagination: PageResponse | undefined;
+}
+
+export interface QueryCoinListRequest {
+  pagination: PageRequest | undefined;
+}
+
+export interface QueryCoinListResponse {
+  coinAll: CoinAll[];
+}
+
+export interface QueryPriceRequest {
+  symbol: string;
+}
+
+export interface QueryPriceResponse {
+  price: number;
 }
 
 const baseQueryParamsRequest: object = {};
@@ -449,6 +467,249 @@ export const QueryAllCreatorCoinResponse = {
   },
 };
 
+const baseQueryCoinListRequest: object = {};
+
+export const QueryCoinListRequest = {
+  encode(
+    message: QueryCoinListRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryCoinListRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryCoinListRequest } as QueryCoinListRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryCoinListRequest {
+    const message = { ...baseQueryCoinListRequest } as QueryCoinListRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryCoinListRequest): unknown {
+    const obj: any = {};
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageRequest.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryCoinListRequest>): QueryCoinListRequest {
+    const message = { ...baseQueryCoinListRequest } as QueryCoinListRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryCoinListResponse: object = {};
+
+export const QueryCoinListResponse = {
+  encode(
+    message: QueryCoinListResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    for (const v of message.coinAll) {
+      CoinAll.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryCoinListResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryCoinListResponse } as QueryCoinListResponse;
+    message.coinAll = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.coinAll.push(CoinAll.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryCoinListResponse {
+    const message = { ...baseQueryCoinListResponse } as QueryCoinListResponse;
+    message.coinAll = [];
+    if (object.coinAll !== undefined && object.coinAll !== null) {
+      for (const e of object.coinAll) {
+        message.coinAll.push(CoinAll.fromJSON(e));
+      }
+    }
+    return message;
+  },
+
+  toJSON(message: QueryCoinListResponse): unknown {
+    const obj: any = {};
+    if (message.coinAll) {
+      obj.coinAll = message.coinAll.map((e) =>
+        e ? CoinAll.toJSON(e) : undefined
+      );
+    } else {
+      obj.coinAll = [];
+    }
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryCoinListResponse>
+  ): QueryCoinListResponse {
+    const message = { ...baseQueryCoinListResponse } as QueryCoinListResponse;
+    message.coinAll = [];
+    if (object.coinAll !== undefined && object.coinAll !== null) {
+      for (const e of object.coinAll) {
+        message.coinAll.push(CoinAll.fromPartial(e));
+      }
+    }
+    return message;
+  },
+};
+
+const baseQueryPriceRequest: object = { symbol: "" };
+
+export const QueryPriceRequest = {
+  encode(message: QueryPriceRequest, writer: Writer = Writer.create()): Writer {
+    if (message.symbol !== "") {
+      writer.uint32(10).string(message.symbol);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryPriceRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryPriceRequest } as QueryPriceRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.symbol = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryPriceRequest {
+    const message = { ...baseQueryPriceRequest } as QueryPriceRequest;
+    if (object.symbol !== undefined && object.symbol !== null) {
+      message.symbol = String(object.symbol);
+    } else {
+      message.symbol = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryPriceRequest): unknown {
+    const obj: any = {};
+    message.symbol !== undefined && (obj.symbol = message.symbol);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryPriceRequest>): QueryPriceRequest {
+    const message = { ...baseQueryPriceRequest } as QueryPriceRequest;
+    if (object.symbol !== undefined && object.symbol !== null) {
+      message.symbol = object.symbol;
+    } else {
+      message.symbol = "";
+    }
+    return message;
+  },
+};
+
+const baseQueryPriceResponse: object = { price: 0 };
+
+export const QueryPriceResponse = {
+  encode(
+    message: QueryPriceResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.price !== 0) {
+      writer.uint32(8).uint64(message.price);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryPriceResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryPriceResponse } as QueryPriceResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.price = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryPriceResponse {
+    const message = { ...baseQueryPriceResponse } as QueryPriceResponse;
+    if (object.price !== undefined && object.price !== null) {
+      message.price = Number(object.price);
+    } else {
+      message.price = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryPriceResponse): unknown {
+    const obj: any = {};
+    message.price !== undefined && (obj.price = message.price);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryPriceResponse>): QueryPriceResponse {
+    const message = { ...baseQueryPriceResponse } as QueryPriceResponse;
+    if (object.price !== undefined && object.price !== null) {
+      message.price = object.price;
+    } else {
+      message.price = 0;
+    }
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -461,6 +722,10 @@ export interface Query {
   CreatorCoinAll(
     request: QueryAllCreatorCoinRequest
   ): Promise<QueryAllCreatorCoinResponse>;
+  /** Queries a list of CoinList items. */
+  CoinList(request: QueryCoinListRequest): Promise<QueryCoinListResponse>;
+  /** Queries a list of Price items. */
+  Price(request: QueryPriceRequest): Promise<QueryPriceResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -493,6 +758,20 @@ export class QueryClientImpl implements Query {
       QueryAllCreatorCoinResponse.decode(new Reader(data))
     );
   }
+
+  CoinList(request: QueryCoinListRequest): Promise<QueryCoinListResponse> {
+    const data = QueryCoinListRequest.encode(request).finish();
+    const promise = this.rpc.request("tbc.tbc.Query", "CoinList", data);
+    return promise.then((data) =>
+      QueryCoinListResponse.decode(new Reader(data))
+    );
+  }
+
+  Price(request: QueryPriceRequest): Promise<QueryPriceResponse> {
+    const data = QueryPriceRequest.encode(request).finish();
+    const promise = this.rpc.request("tbc.tbc.Query", "Price", data);
+    return promise.then((data) => QueryPriceResponse.decode(new Reader(data)));
+  }
 }
 
 interface Rpc {
@@ -502,6 +781,16 @@ interface Rpc {
     data: Uint8Array
   ): Promise<Uint8Array>;
 }
+
+declare var self: any | undefined;
+declare var window: any | undefined;
+var globalThis: any = (() => {
+  if (typeof globalThis !== "undefined") return globalThis;
+  if (typeof self !== "undefined") return self;
+  if (typeof window !== "undefined") return window;
+  if (typeof global !== "undefined") return global;
+  throw "Unable to locate global object";
+})();
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 export type DeepPartial<T> = T extends Builtin
@@ -513,3 +802,15 @@ export type DeepPartial<T> = T extends Builtin
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+function longToNumber(long: Long): number {
+  if (long.gt(Number.MAX_SAFE_INTEGER)) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  return long.toNumber();
+}
+
+if (util.Long !== Long) {
+  util.Long = Long as any;
+  configure();
+}

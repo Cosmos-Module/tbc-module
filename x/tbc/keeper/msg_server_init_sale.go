@@ -15,7 +15,7 @@ import (
 func (k msgServer) InitSale(goCtx context.Context, msg *types.MsgInitSale) (*types.MsgInitSaleResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	baseCreatorCoin, _ := sdk.ParseCoinNormalized(msg.MaxSupply)
+	baseCreatorCoin, _ := sdk.ParseCoinNormalized(msg.InitialSupply)
 	displayCreatorCoinDenom := fmt.Sprintf("CC-%d", baseCreatorCoin.Denom)
 	k.bankKeeper.SetDenomMetaData(ctx, banktypes.Metadata{
 		Description: fmt.Sprintf("Creator Coin %d", baseCreatorCoin.Denom),
