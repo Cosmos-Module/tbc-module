@@ -1,0 +1,9 @@
+syntax = "proto3";
+package tbc.tbc;
+
+option go_package = "tbc/x/tbc/types";
+
+message CoinAll {
+  string creator = 1;
+  string symbol = 2; 
+}

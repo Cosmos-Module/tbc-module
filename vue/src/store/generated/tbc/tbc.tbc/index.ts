@@ -1,10 +1,11 @@
 import { txClient, queryClient, MissingWalletError , registry} from './module'
 
+import { CoinAll } from "./module/types/tbc/coin_all"
 import { CreatorCoin } from "./module/types/tbc/creator_coin"
 import { Params } from "./module/types/tbc/params"
 
 
-export { CreatorCoin, Params };
+export { CoinAll, CreatorCoin, Params };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -45,8 +46,14 @@ const getDefaultState = () => {
 				Params: {},
 				CreatorCoin: {},
 				CreatorCoinAll: {},
+				CoinList: {},
+				Price: {},
+				CoinBatch: {},
+				PricePay: {},
+				PriceBatch: {},
 				
 				_Structure: {
+						CoinAll: getStructure(CoinAll.fromPartial({})),
 						CreatorCoin: getStructure(CreatorCoin.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
 						
@@ -94,6 +101,36 @@ export default {
 						(<any> params).query=null
 					}
 			return state.CreatorCoinAll[JSON.stringify(params)] ?? {}
+		},
+				getCoinList: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.CoinList[JSON.stringify(params)] ?? {}
+		},
+				getPrice: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.Price[JSON.stringify(params)] ?? {}
+		},
+				getCoinBatch: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.CoinBatch[JSON.stringify(params)] ?? {}
+		},
+				getPricePay: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.PricePay[JSON.stringify(params)] ?? {}
+		},
+				getPriceBatch: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.PriceBatch[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -194,6 +231,120 @@ export default {
 				return getters['getCreatorCoinAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
 				throw new Error('QueryClient:QueryCreatorCoinAll API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryCoinList({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryCoinList(query)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await queryClient.queryCoinList({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'CoinList', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryCoinList', payload: { options: { all }, params: {...key},query }})
+				return getters['getCoinList']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryCoinList API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryPrice({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryPrice( key.symbol)).data
+				
+					
+				commit('QUERY', { query: 'Price', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryPrice', payload: { options: { all }, params: {...key},query }})
+				return getters['getPrice']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryPrice API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryCoinBatch({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryCoinBatch( key.queryList)).data
+				
+					
+				commit('QUERY', { query: 'CoinBatch', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryCoinBatch', payload: { options: { all }, params: {...key},query }})
+				return getters['getCoinBatch']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryCoinBatch API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryPricePay({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryPricePay( key.coin)).data
+				
+					
+				commit('QUERY', { query: 'PricePay', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryPricePay', payload: { options: { all }, params: {...key},query }})
+				return getters['getPricePay']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryPricePay API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryPriceBatch({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryPriceBatch( key.queryList)).data
+				
+					
+				commit('QUERY', { query: 'PriceBatch', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryPriceBatch', payload: { options: { all }, params: {...key},query }})
+				return getters['getPriceBatch']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryPriceBatch API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

@@ -20,6 +20,11 @@ export interface RpcStatus {
   details?: ProtobufAny[];
 }
 
+export interface TbcCoinAll {
+  creator?: string;
+  symbol?: string;
+}
+
 export interface TbcCreatorCoin {
   index?: string;
   creator?: string;
@@ -53,6 +58,14 @@ export interface TbcQueryAllCreatorCoinResponse {
   pagination?: V1Beta1PageResponse;
 }
 
+export interface TbcQueryCoinBatchResponse {
+  creatorCoin?: TbcCreatorCoin[];
+}
+
+export interface TbcQueryCoinListResponse {
+  coinAll?: TbcCoinAll[];
+}
+
 export interface TbcQueryGetCreatorCoinResponse {
   creatorCoin?: TbcCreatorCoin;
 }
@@ -63,6 +76,20 @@ export interface TbcQueryGetCreatorCoinResponse {
 export interface TbcQueryParamsResponse {
   /** params holds all the parameters of this module. */
   params?: TbcParams;
+}
+
+export interface TbcQueryPriceBatchResponse {
+  price?: string[];
+}
+
+export interface TbcQueryPricePayResponse {
+  /** @format uint64 */
+  price?: string;
+}
+
+export interface TbcQueryPriceResponse {
+  /** @format uint64 */
+  price?: string;
 }
 
 /**
@@ -320,10 +347,52 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title tbc/creator_coin.proto
+ * @title tbc/coin_all.proto
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryCoinBatch
+   * @summary Queries a list of CoinBatch items.
+   * @request GET:/tbc/tbc/coin_batch/{queryList}
+   */
+  queryCoinBatch = (queryList: string, params: RequestParams = {}) =>
+    this.request<TbcQueryCoinBatchResponse, RpcStatus>({
+      path: `/tbc/tbc/coin_batch/${queryList}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryCoinList
+   * @summary Queries a list of CoinList items.
+   * @request GET:/tbc/tbc/coin_list
+   */
+  queryCoinList = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<TbcQueryCoinListResponse, RpcStatus>({
+      path: `/tbc/tbc/coin_list`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
   /**
    * No description
    *
@@ -377,6 +446,54 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
   queryParams = (params: RequestParams = {}) =>
     this.request<TbcQueryParamsResponse, RpcStatus>({
       path: `/tbc/tbc/params`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryPrice
+   * @summary Queries a list of Price items.
+   * @request GET:/tbc/tbc/price/{symbol}
+   */
+  queryPrice = (symbol: string, params: RequestParams = {}) =>
+    this.request<TbcQueryPriceResponse, RpcStatus>({
+      path: `/tbc/tbc/price/${symbol}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryPriceBatch
+   * @summary Queries a list of PriceBatch items.
+   * @request GET:/tbc/tbc/price_batch/{queryList}
+   */
+  queryPriceBatch = (queryList: string, params: RequestParams = {}) =>
+    this.request<TbcQueryPriceBatchResponse, RpcStatus>({
+      path: `/tbc/tbc/price_batch/${queryList}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryPricePay
+   * @summary Queries a list of PricePay items.
+   * @request GET:/tbc/tbc/price_pay/{coin}
+   */
+  queryPricePay = (coin: string, params: RequestParams = {}) =>
+    this.request<TbcQueryPricePayResponse, RpcStatus>({
+      path: `/tbc/tbc/price_pay/${coin}`,
       method: "GET",
       format: "json",
       ...params,
